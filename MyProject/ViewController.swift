@@ -11,9 +11,17 @@ class ViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view.
+        imageView.image = UIImage(named: "logo")
     }
 
-
+    @IBAction func Registration(_ sender: Any) {
+        let registrationVC = RegistrationViewController()
+        navigationController?.pushViewController(registrationVC, animated: true)
+    }
+    
+    
+    @IBOutlet weak var imageView: UIImageView!
+    
+    
 }
 
