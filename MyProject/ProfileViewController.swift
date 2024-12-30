@@ -9,8 +9,8 @@ class ProfileViewController: UIViewController {
     private let genderLabel = UILabel()
     private let logoutButton = UIButton(type: .system)
     private let activityChartView = LineChartView()
-    private let distanceLabel = UILabel() // Для отображения "Дистанция" и километража
-    private let chartContainerView = UIView() // Контейнер для графика
+    private let distanceLabel = UILabel()
+    private let chartContainerView = UIView()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -23,7 +23,7 @@ class ProfileViewController: UIViewController {
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        // Обновляем график каждый раз, когда экран появляется
+     
         setupChart()
     }
 
@@ -75,13 +75,11 @@ class ProfileViewController: UIViewController {
         activityTitleLabel.textAlignment = .center
         activityTitleLabel.translatesAutoresizingMaskIntoConstraints = false
         
-        // Настройка distanceLabel
         distanceLabel.text = "Дистанция: 0.00 км"
         distanceLabel.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         distanceLabel.textAlignment = .center
         distanceLabel.translatesAutoresizingMaskIntoConstraints = false
         
-        // Настройка контейнера для графика
         chartContainerView.backgroundColor = .white
         chartContainerView.layer.cornerRadius = 12
         chartContainerView.layer.shadowColor = UIColor.black.cgColor
@@ -109,16 +107,16 @@ class ProfileViewController: UIViewController {
             userInfoStackView.bottomAnchor.constraint(equalTo: userInfoContainer.bottomAnchor, constant: -16),
             
             activityTitleLabel.topAnchor.constraint(equalTo: userInfoContainer.bottomAnchor, constant: 20),
-            activityTitleLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor), // Центрируем по горизонтали
+            activityTitleLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             
             distanceLabel.topAnchor.constraint(equalTo: activityTitleLabel.bottomAnchor, constant: 10),
             distanceLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             distanceLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             
-            chartContainerView.topAnchor.constraint(equalTo: distanceLabel.bottomAnchor, constant: 20), // Сдвигаем график ниже
+            chartContainerView.topAnchor.constraint(equalTo: distanceLabel.bottomAnchor, constant: 20),
             chartContainerView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             chartContainerView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-            chartContainerView.heightAnchor.constraint(equalToConstant: 220), // Увеличиваем высоту контейнера
+            chartContainerView.heightAnchor.constraint(equalToConstant: 220),
             
             activityChartView.topAnchor.constraint(equalTo: chartContainerView.topAnchor, constant: 10),
             activityChartView.leadingAnchor.constraint(equalTo: chartContainerView.leadingAnchor, constant: 10),
@@ -202,12 +200,10 @@ class ProfileViewController: UIViewController {
         activityChartView.noDataText = "Нет данных для отображения"
         activityChartView.clear()
 
-        // Убираем легенду (синий квадратик)
         activityChartView.legend.enabled = false
 
         let activities = loadActivities()
         
-        // Фильтруем последние 6 дней
         let lastSixDaysActivities = filterLastSixDaysActivities(activities)
         
         let groupedActivities = groupActivitiesByDate(lastSixDaysActivities)
@@ -216,7 +212,7 @@ class ProfileViewController: UIViewController {
             ChartDataEntry(x: Double(index), y: activity.distance)
         }
 
-        let dataSet = LineChartDataSet(entries: entries, label: "") // Убираем надпись "Дистанция (км)"
+        let dataSet = LineChartDataSet(entries: entries, label: "")
         dataSet.colors = [NSUIColor.systemBlue]
         dataSet.circleColors = [NSUIColor.systemBlue]
         dataSet.circleRadius = 5
@@ -236,7 +232,6 @@ class ProfileViewController: UIViewController {
         activityChartView.leftAxis.axisMinimum = 0
         activityChartView.rightAxis.enabled = false
 
-        // Добавляем обработчик нажатия на точки графика
         activityChartView.delegate = self
 
         activityChartView.animate(xAxisDuration: 1.5, yAxisDuration: 1.5)
@@ -253,10 +248,8 @@ class ProfileViewController: UIViewController {
     }
 
     private func filterLastSixDaysActivities(_ activities: [ActivityData]) -> [ActivityData] {
-        // Сортируем активности по дате в порядке убывания
         let sortedActivities = activities.sorted { $0.date > $1.date }
         
-        // Берем первые 6 активностей (последние 6 дней)
         let lastSixDaysActivities = Array(sortedActivities.prefix(6))
         
         return lastSixDaysActivities
@@ -265,17 +258,13 @@ class ProfileViewController: UIViewController {
 
 extension ProfileViewController: ChartViewDelegate {
     func chartValueSelected(_ chartView: ChartViewBase, entry: ChartDataEntry, highlight: Highlight) {
-        // Получаем индекс выбранной точки
         let index = Int(entry.x)
         
-        // Получаем данные о активностях
         let activities = loadActivities()
         let groupedActivities = groupActivitiesByDate(activities)
         
-        // Обновляем текст distanceLabel
         if index < groupedActivities.count {
             let activity = groupedActivities[index]
-            // Форматируем значение до двух знаков после запятой
             let formattedDistance = String(format: "%.2f", activity.distance)
             distanceLabel.text = "Дистанция: \(formattedDistance) км"
         }

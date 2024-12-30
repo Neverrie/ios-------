@@ -102,7 +102,6 @@ class ActivityCell: UITableViewCell {
         typeLabel.text = activity.type
         timeAgoLabel.text = formatTimeAgo(activity.date)
         
-        // Управление видимостью никнейма
         nicknameLabel.isHidden = !showNickname
         nicknameLabel.text = nickname
     }

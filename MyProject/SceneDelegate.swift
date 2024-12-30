@@ -14,12 +14,12 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         window.makeKeyAndVisible()
     }
 
-    // Метод для перехода на экран входа
+    
     func switchToLogin() {
         guard let window = self.window else { return }
         
-        // Создайте экземпляр вашего контроллера входа
-        let loginViewController = LoginViewController() // Замените `LoginViewController` на ваш контроллер входа
+        
+        let loginViewController = LoginViewController()
         let navigationController = UINavigationController(rootViewController: loginViewController)
         
         // Установите navigationController как rootViewController

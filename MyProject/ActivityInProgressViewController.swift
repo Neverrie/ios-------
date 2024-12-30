@@ -223,6 +223,16 @@ class ActivityInProgressViewController: UIViewController, MKMapViewDelegate, CLL
         setupLocationManager()
     }
 
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        tabBarController?.tabBar.isHidden = true
+    }
+
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        tabBarController?.tabBar.isHidden = false
+    }
+
     private func setupUI() {
         view.addSubview(mapView)
         view.addSubview(activitySelectionStack)
@@ -330,11 +340,9 @@ class ActivityInProgressViewController: UIViewController, MKMapViewDelegate, CLL
         UserDefaults.standard.set(startTime, forKey: "activityStartTime")
         
         startTimer()
-        startSimulation()
     }
 
     private func setupLocationManager() {
-        tabBarController?.tabBar.isHidden = true
         locationManager.delegate = self
         locationManager.requestAlwaysAuthorization()
         locationManager.startUpdatingLocation()
@@ -384,7 +392,7 @@ class ActivityInProgressViewController: UIViewController, MKMapViewDelegate, CLL
     
     private func formatDate(_ date: Date) -> String {
         let formatter = DateFormatter()
-        formatter.dateFormat = "MMM dd" 
+        formatter.dateFormat = "MMM dd"
         return formatter.string(from: date)
     }
     
@@ -399,7 +407,6 @@ class ActivityInProgressViewController: UIViewController, MKMapViewDelegate, CLL
         saveActivityData(activityData)
         
         navigationController?.popViewController(animated: true)
-        tabBarController?.tabBar.isHidden = false
     }
 
     private func saveActivityData(_ activityData: ActivityData) {
@@ -459,49 +466,5 @@ class ActivityInProgressViewController: UIViewController, MKMapViewDelegate, CLL
         }
         
         return MKOverlayRenderer()
-    }
-}
-
-extension ActivityInProgressViewController {
-    private func startSimulation() {
-        let simulatedRoute = [
-            CLLocationCoordinate2D(latitude: 43.0232, longitude: 131.8915),
-            CLLocationCoordinate2D(latitude: 43.0238, longitude: 131.8918),
-            CLLocationCoordinate2D(latitude: 43.0242, longitude: 131.8920),
-            CLLocationCoordinate2D(latitude: 43.0248, longitude: 131.8923),
-            CLLocationCoordinate2D(latitude: 43.0252, longitude: 131.8928),
-            CLLocationCoordinate2D(latitude: 43.0255, longitude: 131.8932),
-            CLLocationCoordinate2D(latitude: 43.0250, longitude: 131.8938),
-            CLLocationCoordinate2D(latitude: 43.0245, longitude: 131.8935),
-            CLLocationCoordinate2D(latitude: 43.0240, longitude: 131.8930),
-            CLLocationCoordinate2D(latitude: 43.0235, longitude: 131.8925),
-            CLLocationCoordinate2D(latitude: 43.0232, longitude: 131.8915)
-        ]
-
-        var currentIndex = 0
-
-        Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] timer in
-            guard let self = self else { return }
-            
-            if self.isPaused {
-                return
-            }
-            
-            if currentIndex >= simulatedRoute.count {
-                timer.invalidate()
-                return
-            }
-            
-            let simulatedLocation = CLLocation(
-                coordinate: simulatedRoute[currentIndex],
-                altitude: 0,
-                horizontalAccuracy: 1,
-                verticalAccuracy: 1,
-                timestamp: Date()
-            )
-            self.locationManager(self.locationManager, didUpdateLocations: [simulatedLocation])
-            
-            currentIndex += 1
-        }
     }
 }

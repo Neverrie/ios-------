@@ -78,6 +78,11 @@ class ActivitiesViewController: UIViewController {
         setupActions()
         updateUI()
     }
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        
+        tabBarController?.tabBar.isHidden = false
+    }
     
     private func setupUI() {
         view.addSubview(titleLabel)
@@ -240,19 +245,17 @@ extension ActivitiesViewController: UITableViewDelegate, UITableViewDataSource {
         }
         
         if segmentedControl.selectedSegmentIndex == 0 {
-            // Мои активности
             let sortedKeys = Array(groupedActivities.keys).sorted(by: { $0 > $1 })
             let key = sortedKeys[indexPath.section]
             if let activity = groupedActivities[key]?[indexPath.row] {
-                cell.configure(with: activity, showNickname: false) // Никнейм скрыт
+                cell.configure(with: activity, showNickname: false)
             }
         } else {
-            // Активности сообщества
+            
             let sortedKeys = Array(groupedCommunityActivities.keys).sorted(by: { $0 > $1 })
             let key = sortedKeys[indexPath.section]
             if let activity = groupedCommunityActivities[key]?[indexPath.row] {
-                // Здесь нужно передать никнейм, например, из данных активности
-                let nickname = "@van_darkholme" // Пример никнейма
+                let nickname = "@van_darkholme"
                 cell.configure(with: activity, showNickname: true, nickname: nickname)
             }
         }
