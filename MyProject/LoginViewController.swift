@@ -1,17 +1,18 @@
 import UIKit
-//ctrl c с регистрации, найс
+//ctrl c с регистрации, найс upd ладно нет
 class LoginViewController: UIViewController {
     
     private let continueButton = UIButton(type: .system)
+    private let loginTextField = UITextField()
     
     private func createTextField(placeholder: String, isSecure: Bool = false) -> UITextField {
-            let textField = UITextField()
-            textField.placeholder = placeholder
-            textField.borderStyle = .roundedRect
-            textField.isSecureTextEntry = isSecure
-            textField.heightAnchor.constraint(equalToConstant: 50).isActive = true
-            return textField
-        }
+        let textField = UITextField()
+        textField.placeholder = placeholder
+        textField.borderStyle = .roundedRect
+        textField.isSecureTextEntry = isSecure
+        textField.heightAnchor.constraint(equalToConstant: 50).isActive = true
+        return textField
+    }
     
     override func viewDidLoad(){
         super.viewDidLoad()
@@ -22,16 +23,17 @@ class LoginViewController: UIViewController {
     }
     
     private func setupUI() {
-        
         let titleLabel = UILabel()
         titleLabel.text = "Войти"
         titleLabel.font = UIFont.systemFont(ofSize: 24, weight: .bold)
         titleLabel.textAlignment = .center
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         
-        let loginTextField = createTextField(placeholder: "Логин")
-        let passwordTextField = createTextField(placeholder: "Пароль", isSecure: true)
+        loginTextField.placeholder = "Логин"
+        loginTextField.borderStyle = .roundedRect
+        loginTextField.heightAnchor.constraint(equalToConstant: 50).isActive = true
         
+        let passwordTextField = createTextField(placeholder: "Пароль", isSecure: true)
         
         let stackView = UIStackView(arrangedSubviews: [
             loginTextField,
@@ -57,7 +59,6 @@ class LoginViewController: UIViewController {
         logoImageView.contentMode = .scaleAspectFit
         logoImageView.image = UIImage(named: "minilogo")
         logoImageView.translatesAutoresizingMaskIntoConstraints = false
-        
         
         view.addSubview(titleLabel)
         view.addSubview(stackView)
@@ -86,12 +87,38 @@ class LoginViewController: UIViewController {
             logoImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             logoImageView.heightAnchor.constraint(equalToConstant: 100),
             logoImageView.widthAnchor.constraint(equalToConstant: 100)
-            
-           ])
+        ])
     }
+    
     @objc private func continueToProfile() {
-        if let sceneDelegate = view.window?.windowScene?.delegate as? SceneDelegate {
-            sceneDelegate.switchToMainTabBar()
+        guard let login = loginTextField.text, !login.isEmpty else {
+
+            let alert = UIAlertController(title: "Ошибка", message: "Введите логин", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+            present(alert, animated: true, completion: nil)
+            return
+        }
+        
+
+        if let userData = UserDefaults.standard.data(forKey: "currentUser"),
+           let user = try? JSONDecoder().decode(User.self, from: userData) {
+            
+            if user.login == login {
+            
+                if let sceneDelegate = view.window?.windowScene?.delegate as? SceneDelegate {
+                    sceneDelegate.switchToMainTabBar()
+                }
+            } else {
+                
+                let alert = UIAlertController(title: "Ошибка", message: "Пользователь с таким логином не найден", preferredStyle: .alert)
+                alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+                present(alert, animated: true, completion: nil)
+            }
+        } else {
+            
+            let alert = UIAlertController(title: "Ошибка", message: "Пользователь не найден", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+            present(alert, animated: true, completion: nil)
         }
     }
 }

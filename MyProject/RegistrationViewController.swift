@@ -1,27 +1,35 @@
 import UIKit
 
-class RegistrationViewController: UIViewController{
+struct User: Codable {
+    let login: String
+    let name: String
+    let gender: String
+}
+
+class RegistrationViewController: UIViewController {
+    
+    private var loginTextField = UITextField()
+    private var nameTextField = UITextField()
     
     private let genderButton = UIButton(type: .system)
     private let continueButton = UIButton(type: .system)
     
     private func createTextField(placeholder: String, isSecure: Bool = false) -> UITextField {
-            let textField = UITextField()
-            textField.placeholder = placeholder
-            textField.borderStyle = .roundedRect
-            textField.isSecureTextEntry = isSecure
-            textField.heightAnchor.constraint(equalToConstant: 50).isActive = true
-            return textField
-        }
+        let textField = UITextField()
+        textField.placeholder = placeholder
+        textField.borderStyle = .roundedRect
+        textField.isSecureTextEntry = isSecure
+        textField.heightAnchor.constraint(equalToConstant: 50).isActive = true
+        return textField
+    }
     
     override func viewDidLoad() {
-            super.viewDidLoad()
-            view.backgroundColor = .white
-            setupUI()
+        super.viewDidLoad()
+        view.backgroundColor = .white
+        setupUI()
         
-            continueButton.addTarget(self, action: #selector(continueToProfile), for: .touchUpInside)
-
-        }
+        continueButton.addTarget(self, action: #selector(continueToProfile), for: .touchUpInside)
+    }
     
     private func setupUI() {
         let logoImageView = UIImageView()
@@ -34,12 +42,12 @@ class RegistrationViewController: UIViewController{
         titleLabel.font = UIFont.systemFont(ofSize: 24, weight: .bold)
         titleLabel.textAlignment = .center
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
-//сколько умного текста, жесть, даже понятно
-        let loginTextField = createTextField(placeholder: "Логин")
-        let nameTextField = createTextField(placeholder: "Имя или никнейм")
+        
+        loginTextField = createTextField(placeholder: "Логин")
+        nameTextField = createTextField(placeholder: "Имя или никнейм")
         let passwordTextField = createTextField(placeholder: "Пароль", isSecure: true)
         let confirmPasswordTextField = createTextField(placeholder: "Повторите пароль", isSecure: true)
-
+        
         let genderLabel = UILabel()
         genderLabel.text = "Пол"
         genderLabel.font = UIFont.systemFont(ofSize: 16)
@@ -66,7 +74,6 @@ class RegistrationViewController: UIViewController{
         stackView.spacing = 16
         stackView.translatesAutoresizingMaskIntoConstraints = false
 
-        
         continueButton.setTitle("Продолжить", for: .normal)
         continueButton.setTitleColor(.white, for: .normal)
         continueButton.backgroundColor = .systemBlue
@@ -82,13 +89,12 @@ class RegistrationViewController: UIViewController{
         subtitleLabel.numberOfLines = 0
         subtitleLabel.translatesAutoresizingMaskIntoConstraints = false
         
-        
         view.addSubview(titleLabel)
         view.addSubview(stackView)
         view.addSubview(continueButton)
         view.addSubview(subtitleLabel)
         view.addSubview(logoImageView)
-//верстка :(
+        
         NSLayoutConstraint.activate([
             titleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 40),
             titleLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
@@ -112,29 +118,46 @@ class RegistrationViewController: UIViewController{
         ])
     }
 
-
     @objc private func selectGender() {
-            let alert = UIAlertController(title: "Выберите пол", message: nil, preferredStyle: .actionSheet)
-            alert.addAction(UIAlertAction(title: "Мужской", style: .default, handler: { _ in
-                self.genderButton.setTitle("Мужской", for: .normal)
-            }))
-            alert.addAction(UIAlertAction(title: "Женский", style: .default, handler: { _ in
-                self.genderButton.setTitle("Женский", for: .normal)
-            }))
-            alert.addAction(UIAlertAction(title: "Отмена", style: .cancel, handler: nil))
-            
-            if let popover = alert.popoverPresentationController {
-                popover.sourceView = self.genderButton
-                popover.sourceRect = self.genderButton.bounds
-            }
-            
-            present(alert, animated: true, completion: nil)
+        let alert = UIAlertController(title: "Выберите пол", message: nil, preferredStyle: .actionSheet)
+        alert.addAction(UIAlertAction(title: "Мужской", style: .default, handler: { _ in
+            self.genderButton.setTitle("Мужской", for: .normal)
+        }))
+        alert.addAction(UIAlertAction(title: "Женский", style: .default, handler: { _ in
+            self.genderButton.setTitle("Женский", for: .normal)
+        }))
+        alert.addAction(UIAlertAction(title: "Отмена", style: .cancel, handler: nil))
+        
+        if let popover = alert.popoverPresentationController {
+            popover.sourceView = self.genderButton
+            popover.sourceRect = self.genderButton.bounds
         }
+        
+        present(alert, animated: true, completion: nil)
+    }
+
     @objc private func continueToProfile() {
+        guard let login = loginTextField.text, !login.isEmpty,
+              let name = nameTextField.text, !name.isEmpty,
+              let gender = genderButton.titleLabel?.text, gender != "Выберите" else {
+            let alert = UIAlertController(title: "Ошибка", message: "Заполните все поля", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+            present(alert, animated: true, completion: nil)
+            return
+        }
+        
+        UserDefaults.standard.removeObject(forKey: "activities")
+        
+        let user = User(login: login, name: name, gender: gender)
+        saveUser(user)
+        
         if let sceneDelegate = view.window?.windowScene?.delegate as? SceneDelegate {
             sceneDelegate.switchToMainTabBar()
-            
         }
     }
 
+    private func saveUser(_ user: User) {
+        let userData = try? JSONEncoder().encode(user)
+        UserDefaults.standard.set(userData, forKey: "currentUser")
+    }
 }

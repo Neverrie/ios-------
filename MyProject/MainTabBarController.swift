@@ -17,4 +17,10 @@ class MainTabBarController: UITabBarController {
         tabBar.tintColor = .systemBlue
         tabBar.backgroundColor = .white
     }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if let vc = segue.destination as? ActivityInProgressViewController {
+            vc.hidesBottomBarWhenPushed = true
+        }
+    }
 }

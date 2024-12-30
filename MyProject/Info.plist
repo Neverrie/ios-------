@@ -15,9 +15,22 @@
 					<string>Default Configuration</string>
 					<key>UISceneDelegateClassName</key>
 					<string>$(PRODUCT_MODULE_NAME).SceneDelegate</string>
+					<key>NSLocationAlwaysUsageDescription</key>
+					<string></string>
 				</dict>
 			</array>
 		</dict>
 	</dict>
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>Мы используем ваше местоположение для отображения маршрута и отслеживания активности.</string>
+    <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+    <string>Мы используем ваше местоположение для более точного отображения маршрута.</string>
+
+    <key>UIBackgroundModes</key>
+    <array>
+        <string>location</string>
+    </array>
+
+
 </dict>
 </plist>
